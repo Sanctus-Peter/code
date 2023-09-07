@@ -16,7 +16,7 @@ app.add_middleware(
 )
 
 
-@app.get("/api/")
+@app.get("/api")
 async def root(slack_name: str, track: str):
     try:
         # Current day and time
