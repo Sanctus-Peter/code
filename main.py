@@ -21,7 +21,7 @@ async def root(slack_name: str, track: str):
     try:
         # Current day and time
         current_day = datetime.now().strftime("%A")
-        utc_time = datetime.utcnow()
+        utc_time = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
 
         # GitHub URLs
         github_file_url = "https://github.com/Sanctus-Peter/HNG-x/blob/main/HNG-X-1/fastapi/main.py"
