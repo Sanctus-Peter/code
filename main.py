@@ -10,7 +10,7 @@ import models
 
 models.Base.metadata.create_all(bind=db.engine)
 
-app = FastAPI(debug=True)
+app = FastAPI(title='Simple CRUD RESTApi on a person's resorces')
 
 origins = ["*"]
 
