@@ -60,4 +60,4 @@ jobs:
         with:
           app-name: 'hng-task-2'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_FA74412A18084CEE856D7C0C358F8FA0 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D5DBE81BE1784562B86786F4B21C2E24 }}
