@@ -1,7 +1,14 @@
-from datetime import datetime
+import uuid
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Depends, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+
+import db
+import schemas
+import models
+
+models.Base.metadata.create_all(bind=db.engine)
 
 app = FastAPI(debug=True)
 
@@ -16,29 +23,48 @@ app.add_middleware(
 )
 
 
-@app.get("/api/")
-async def root(slack_name: str, track: str):
-    try:
-        # Current day and time
-        current_day = datetime.now().strftime("%A")
-        utc_time = datetime.utcnow()
+@app.post("/api", status_code=status.HTTP_201_CREATED, response_model=schemas.User)
+async def create_user(user: schemas.UserCreate, _db: Session = Depends(db.get_db)):
+    new_user = models.User(**user.model_dump())
+    _db.add(new_user)
+    _db.commit()
+    _db.refresh(new_user)
+    return new_user
 
-        # GitHub URLs
-        github_file_url = "https://github.com/Sanctus-Peter/HNG-x/blob/main/HNG-X-1/fastapi/main.py"
-        github_repo_url = "https://github.com/Sanctus-Peter/HNG-x/tree/main/HNG-X-1/"
 
-        # Response JSON
-        response = {
-            "slack_name": slack_name,
-            "current_day": current_day,
-            "utc_time": utc_time,
-            "track": track,
-            "github_file_url": github_file_url,
-            "github_repo_url": github_repo_url,
-            "status_code": 200,
-        }
+@app.get("/api/{user_id}", status_code=status.HTTP_200_OK, response_model=schemas.User)
+async def get_user(user_id: uuid.UUID, _db: Session = Depends(db.get_db)):
+    user = _db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with id {user_id} does not exist"
+        )
+    return user
 
-        return response
 
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+@app.put("/api/{user_id}", status_code=status.HTTP_201_CREATED, response_model=schemas.User)
+async def update_user(user_id: uuid.UUID, userdetails: schemas.UserCreate, _db: Session = Depends(db.get_db)):
+    user = _db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with id {user_id} does not exist"
+        )
+    user.name = userdetails.name
+    _db.commit()
+    _db.refresh(user)
+    return user
+
+
+@app.delete("/api/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(user_id: uuid.UUID, _db: Session = Depends(db.get_db)):
+    user = _db.query(models.User).filter(models.User.id == user_id).first()
+    if user:
+        _db.delete(user)
+        _db.commit()
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with id {user_id} does not exist"
+        )
