@@ -60,4 +60,4 @@ jobs:
         with:
           app-name: 'free-lunch-app'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E01CF82F56C4435C95302168072B679E }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_A168E2F8CE824F77999DB2A45917EAB5 }}
