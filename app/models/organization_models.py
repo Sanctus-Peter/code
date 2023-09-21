@@ -12,8 +12,8 @@ class Organization(Base):
     name = Column(String(255), nullable=False)
     lunch_price = Column(DECIMAL(10, 2), nullable=False)
     currency_code = Column(String(4), nullable=True)
-    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("NOW()"))
-    updated_at = Column(TIMESTAMP(timezone=True), nullable=False, onupdate=text("NOW()"))
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
     is_deleted = Column(Boolean, default=False)
 
     users = relationship("User", back_populates="organization")
@@ -28,8 +28,8 @@ class OrganizationLaunchWallet(Base):
     id = Column(Integer, primary_key=True, index=True)
     balance = Column(DECIMAL(10, 2), nullable=False)
     org_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"))
-    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("NOW()"))
-    updated_at = Column(TIMESTAMP(timezone=True), nullable=False, onupdate=text("NOW()"))
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
     is_deleted = Column(Boolean, default=False)
 
     organization = relationship("Organization", back_populates="wallets")
@@ -43,8 +43,8 @@ class OrganizationInvite(Base):
     token = Column(String(255), nullable=False)
     ttl = Column(DateTime, nullable=True)
     org_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"))
-    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("NOW()"))
-    updated_at = Column(TIMESTAMP(timezone=True), nullable=False, onupdate=text("NOW()"))
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
     is_deleted = Column(Boolean, default=False)
 
     organization = relationship("Organization", back_populates="invites")
