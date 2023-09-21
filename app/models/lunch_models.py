@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+from sqlalchemy.dialects.mysql import TEXT
 
 from app.db.database import Base
 
@@ -14,7 +15,7 @@ class Lunch(Base):
     receiver_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
     quantity = Column(Integer, nullable=False)
     redeemed = Column(Boolean, default=False)
-    note = Column(String)
+    note = Column(TEXT)
 
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, onupdate=func.now())

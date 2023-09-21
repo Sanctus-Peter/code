@@ -1,17 +1,17 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
-class UserCreate(BaseModel):
-  email:str
-  password: str
-  first_name: str
-  last_name: str
-  phone_number: str
+class CreateUserSchema(BaseModel):
+    email: EmailStr
+    password: str
+    first_name: str
+    last_name: str
+    phone_number: str
 
 
 class UserResponseSchema(BaseModel):
-  id:str
-  email:str
-  name: str
-  access_token: str
-  is_admin: bool
+    id: int
+    email: str
+    name: str
+    access_token: str
+    is_admin: bool
