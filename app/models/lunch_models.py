@@ -17,8 +17,8 @@ class Lunch(Base):
     redeemed = Column(Boolean, default=False)
     note = Column(TEXT)
 
-    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("NOW()"))
-    updated_at = Column(TIMESTAMP(timezone=True), nullable=False, onupdate=text("NOW()"))
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
     is_deleted = Column(Boolean, default=False)
 
     organization = relationship("Organization", back_populates="lunches")
