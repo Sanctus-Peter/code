@@ -36,9 +36,31 @@ def get_admin_user(
     return user
 
 
-def get_user(db:Session, user_id:int):
+def get_user(
+        token: str = Depends(oauth2_scheme),
+        db: Session = Depends(get_db)
+):
+    """
+        Dependency function to get the user from the access token.
 
-  pass
+        Parameters:
+            - token (str): Access token obtained from the request header.
+            - db (Session): Database session dependency.
+
+        Returns:
+            models.User: Admin user retrieved from the database.
+
+        Raises:
+            HTTPException: If the access token is invalid, user is not found, or user is not authorized.
+        """
+    token = verify_tok(token, credentials_exception)
+    user = db.query(User).filter(User.id == token.id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="You are not authorized to execute this action"
+        )
+    return user
 
 
 def get_user_by_email(db:Session, email:str):

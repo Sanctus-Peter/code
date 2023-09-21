@@ -43,8 +43,8 @@ class Withdrawal(Base):
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
     status = Column(Enum("redeemed", "not_redeemed", name="withdrawal_status"), nullable=False)
     amount = Column(DECIMAL(10, 2), nullable=False)
-    created_at = Column(DateTime, server_default=func.now())
-    updated_at = Column(DateTime, onupdate=func.now())
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("NOW()"))
+    updated_at = Column(TIMESTAMP(timezone=True), nullable=False, onupdate=text("NOW()"))
     is_deleted = Column(Boolean, default=False)
 
     user = relationship("User", back_populates="withdrawals")

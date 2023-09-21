@@ -38,10 +38,13 @@ from datetime import datetime, timedelta
 from fastapi import Depends, status, HTTPException
 from .configs import settings
 from fastapi.security import OAuth2PasswordBearer
+from .jwt_bearer import JWTBearer
 
 from ..schemas.auth import TokData
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
+# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
+oauth2_scheme = JWTBearer()
+
 
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm

@@ -106,7 +106,7 @@ async def user_signup(
         first_name=user.first_name,
         last_name=user.last_name,
         phone=user.phone_number,
-        is_admin=True
+        is_admin=False
     )
     db.add(new_user)
     db.commit()
