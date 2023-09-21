@@ -7,7 +7,7 @@ from fastapi import APIRouter, status, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import EmailStr
 
-from app.models.organization_models import Organization, OrganizationInvite
+from app.models.organization_models import Organization, OrganizationInvite, OrganizationLaunchWallet
 from app.schemas.organization_schemas import CreateOrganizationSchema, OrganizationSchema, CreateOrganizationUserSchema
 from app.db.database import get_db
 from app.models import user_models, User
@@ -142,4 +142,67 @@ async def register_user_in_organization(
             'id': new_user.id,
             'isAdmin': new_user.is_admin
         }
+    }
+
+
+@router.post('/wallet/update', status_code=status.HTTP_200_OK)
+async def update_wallet(
+        balance: float, db: Session = Depends(get_db),
+        role: user_models.User = Depends(get_admin_user)
+):
+    """
+    Update Organization Wallet
+
+    This endpoint allows an admin user to update the organization wallet
+
+    Args:
+        balance: The organization wallet balance
+        db: The database session
+        role: The admin user making the request
+
+    Returns:
+        The updated organization
+    """
+    org_instance = OrganizationLaunchWallet(
+        balance=balance,
+        org_id=role.org_id
+    )
+    db.add(org_instance)
+    db.commit()
+    db.refresh(org_instance)
+
+    return {
+        'message': 'success',
+        'statusCode': 200,
+        'data': None
+    }
+
+
+@router.put('lunch/update', status_code=status.HTTP_200_OK)
+async def update_lunch_price(
+        lunch_price: float, db: Session = Depends(get_db),
+        role: user_models.User = Depends(get_admin_user)
+):
+    """
+    Update Organization Wallet
+
+    This endpoint allows an admin user to update the organization wallet
+
+    Args:
+        lunch_price: The organization wallet balance
+        db: The database session
+        role: The admin user making the request
+
+    Returns:
+        The updated organization
+    """
+    org_instance = db.query(Organization).filter(Organization.id == role.org_id).first()
+    org_instance.lunch_price = lunch_price
+    db.commit()
+    db.refresh(org_instance)
+
+    return {
+        'message': 'success',
+        'statusCode': 200,
+        'data': None
     }

@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from app.settings.configs import settings
 
 SQLALCHEMY_DATABASE_URL = f"mysql+mysqlconnector://\
-{settings.db_username}:{settings.db_password}@{settings.db_hostname}:{settings.db_port}/{settings.db_name}"
+{settings.db_username}:{settings.db_password}@{settings.db_hostname}:{settings.db_port}/sanctusdb"
 
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)

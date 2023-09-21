@@ -15,7 +15,7 @@ class OrganizationSchema(BaseModel):
     lunch_price: Optional[float] = 1000.00
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CreateOrganizationUserSchema(CreateUserSchema):
