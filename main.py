@@ -52,4 +52,3 @@ app.add_middleware(
 )
 
 app.include_router(v1)
-

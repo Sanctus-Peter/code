@@ -7,7 +7,7 @@ class UserBase(BaseModel):
 
 
 class UserLogin(UserBase):
-    password: str 
+    password: str
 
 
 class UserCreate(UserLogin):
@@ -19,22 +19,20 @@ class UserCreate(UserLogin):
 class UserResponseSchema(BaseModel):
     id: str
 
+
 class UserSearchSchema(BaseModel):
     id: int
     first_name: str
     last_name: str
     profile_pic: Optional[str] = None
-
+    is_admin: bool = False
+    lunch_credit_balance: Optional[int] = 0
 
 
 class UserProfileSchema(UserSearchSchema):
-    
     bank_number: Optional[str] = None
     bank_code: Optional[str] = None
     bank_name: Optional[str] = None
-
-
-
 
 
 class UserLoginSchema(BaseModel):
@@ -43,7 +41,3 @@ class UserLoginSchema(BaseModel):
     access_token: Optional[str] = None
     refresh_token: Optional[str] = None
     is_admin: bool = False
-
-
-   
-

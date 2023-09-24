@@ -1,16 +1,18 @@
 from pydantic import BaseModel
 
+
 class Withdraw(BaseModel):
-    bank_number: str
-    bank_code: str
-    bank_name: str
+    bank_number: str | None = ""
+    bank_code: str | None = ""
+    bank_name: str | None = ""
     amount: int
+
 
 class WithdrawResponse(BaseModel):
     id: int
     user_id: int
     status: str
-    amount: int
+    amount: float
     created_at: str
 
 
