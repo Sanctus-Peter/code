@@ -1,54 +1,49 @@
-from typing import List, Optional
-
 from pydantic import BaseModel, EmailStr
+from typing import Optional
 
 
-class CreateUserSchema(BaseModel):
+class UserBase(BaseModel):
     email: EmailStr
-    password: str
+
+
+class UserLogin(UserBase):
+    password: str 
+
+
+class UserCreate(UserLogin):
     first_name: str
     last_name: str
-    phone_number: str
+    phone_number: Optional[str] = ""
 
 
 class UserResponseSchema(BaseModel):
-    id: Optional[str]
-    email: Optional[str]
-    name: Optional[str]
-    access_token: str
-    is_admin: bool
+    id: str
+
+class UserSearchSchema(BaseModel):
+    id: int
+    first_name: str
+    last_name: str
+    profile_pic: Optional[str] = None
 
 
-class UserData(BaseModel):
-    email: Optional[str]
-    name: Optional[str]
-    phone_number: Optional[str]
-    bank_number: Optional[str]
-    bank_code: Optional[str]
-    bank_name: Optional[str]
-    isAdmin: bool
+
+class UserProfileSchema(UserSearchSchema):
+    
+    bank_number: Optional[str] = None
+    bank_code: Optional[str] = None
+    bank_name: Optional[str] = None
 
 
-class UserResponse(BaseModel):
-    message: str
-    statusCode: int
-    data: UserData
 
 
-class UserBankSchema(BaseModel):
-    bank_number: str
-    bank_code: str
-    bank_name: str
+
+class UserLoginSchema(BaseModel):
+    id: int
+    email: EmailStr
+    access_token: Optional[str] = None
+    refresh_token: Optional[str] = None
+    is_admin: bool = False
 
 
-class AllUserData(BaseModel):
-    name: Optional[str]
-    email: Optional[str]
-    profile_picture: Optional[str]
-    user_id: Optional[str]
+   
 
-
-class ResponseData(BaseModel):
-    message: str
-    statusCode: int
-    data: List[AllUserData]

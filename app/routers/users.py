@@ -1,91 +1,94 @@
-from fastapi import APIRouter, status, Depends, HTTPException
+from app.schemas.user_schemas import UserCreate
+from app.services.helper import generate_otp, send_forget_password_email, OTPVerificationMixin
+from app.services.user_services import create_user, hash_password
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
-
+from app.middleware.authenticate import authenticate
 from app.db.database import get_db
-from app.models import user_models, User
-from app.schemas.user_schemas import UserResponse, UserBankSchema, ResponseData, UserData, AllUserData
-from app.services.user_services import get_user, get_admin_user
+from app.services.user_services import (
+    search_user_by_name_or_email,
+    get_org_users
+)
+from app.models.user_models import User
+from app.Responses.response import UserResponse, UserSearchResponse
 
-router = APIRouter(tags=["Users"], prefix="/api/user")
+app = APIRouter(tags=["Users"])
 
 
-@router.get("/profile", status_code=status.HTTP_200_OK, response_model=UserResponse)
-async def get_user_profile(
-        user: user_models.User = Depends(get_user)
+@app.get("/user/profile", response_model=UserResponse)
+async def user_profile(current_user: User = Depends(authenticate)):
+    return {"message": "User data fetched successfully",
+            "statusCode": 200,
+            "data": jsonable_encoder(current_user)}
+
+
+@app.get("/user/search/{name_or_email}", response_model=UserSearchResponse)
+async def search(name_or_email: str, db: Session = Depends(get_db), current_user: User = Depends(authenticate)):
+    try:
+        users = search_user_by_name_or_email(db, name_or_email)
+        return UserSearchResponse(message="User search successful", statusCode=200, data=jsonable_encoder(users))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Internal server error: {str(e)}")
+
+
+@app.get("/user/all", response_model=UserSearchResponse)
+def all_org_users(db: Session = Depends(get_db), current_user: User = Depends(authenticate)):
+    """Returns all users linked to the organization of the current user"""
+    users = get_org_users(db, current_user.org_id)
+
+
+@app.post('/user/forget-password', status_code=status.HTTP_200_OK)
+async def forget_password(
+        email: str,
+        db: Session = Depends(get_db)
 ):
-    """
-    Get user profile
+    """Sends a password reset link to the user's email"""
+    usr_instance = db.query(User).filter(User.email == email).first()
+    if not usr_instance:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    otp = generate_otp(1024, email)
+    response = send_forget_password_email(email, otp)
 
-    This endpoint returns the pofile of an authenticated user
-
-     Args:
-        user: The user making the request
-
-    Returns:
-        The user information
-    """
-    return {
-        'message': 'User data fetched successfully',
-        'statusCode': 200,
-        'data': {
-            'email': user.email,
-            'isAdmin': user.is_admin,
-            'name': user.last_name + ' ' + user.first_name,
-            'phone_number': user.phone,
-            'bank_name': user.bank_name,
-            'bank_code': user.bank_code,
-            'bank_number': user.bank_number
+    if 200 <= int(response.status_code) < 300:
+        return {
+            'message': 'Password reset otp sent successfully',
+            'statusCode': 200,
+            'data': {
+                'email': email
+            }
         }
-    }
+    raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail='There was an error sending the email')
 
 
-@router.post('/bank', status_code=status.HTTP_201_CREATED)
-async def user_bank_details(
-    data: UserBankSchema, db: Session = Depends(get_db),
-    user: user_models.User = Depends(get_user)
+@app.post('/user/reset-password', status_code=status.HTTP_200_OK)
+async def reset_password(
+        email: str,
+        otp: str,
+        password: str,
+        db: Session = Depends(get_db)
 ):
-    """
+    """Resets the user's password"""
+    usr_instance = db.query(User).filter(User.email == email).first()
+    if not usr_instance:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    otp_mixin = OTPVerificationMixin()
+    if not otp_mixin.verify_otp(otp, 1024, email):
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail='Incorrect OTP')
 
-    """
-    user.bank_number = data.bank_number
-    user.bank_code = data.bank_code
-    user.bank_name = data.bank_name
-
+    usr_instance.password_hash = hash_password(password)
     db.commit()
-    db.refresh(user)
     return {
-        'message': 'successfully created bank account',
-        'statusCode': 201
+        'message': 'Password reset successful',
+        'statusCode': 200,
+        'data': None
     }
 
 
-@router.get("/users", status_code=status.HTTP_200_OK, response_model=ResponseData)
-def get_all_users(db: Session = Depends(get_db), role: user_models.User = Depends(get_admin_user)):
-    """
-    Get all users from the database.
-
-    Args:
-        db (Session): SQLAlchemy database session.
-        role: (admin user)
-
-    Returns:
-        ResponseData: Response data in the specified format.
-    """
-    users = db.query(User).filter(User.org_id == role.org_id).all()
-
-    # Transform user data into AllUserData model instances
-    user_data = [
-        AllUserData(
-            name=user.first_name + ' ' + user.last_name,
-            email=user.email,
-            profile_picture=user.profile_pic,
-            user_id=user.id
-        ) for user in users
-    ]
-
-    response_data = ResponseData(
-        message="successfully retrieved user data",
-        statusCode=200,
-        data=user_data,
-    )
-    return response_data

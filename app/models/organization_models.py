@@ -1,7 +1,7 @@
-from sqlalchemy import Column, Integer, String, Boolean, text, TIMESTAMP, DateTime, DECIMAL, Enum, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, DECIMAL, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-
+from uuid import uuid4 as uuid
 from app.db.database import Base
 
 
@@ -11,7 +11,7 @@ class Organization(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
     lunch_price = Column(DECIMAL(10, 2), nullable=False)
-    currency_code = Column(String(4), nullable=True)
+    currency_code = Column(String(4), nullable=False)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, onupdate=func.now())
     is_deleted = Column(Boolean, default=False)
@@ -41,12 +41,10 @@ class OrganizationInvite(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String(255), nullable=False)
     token = Column(String(255), nullable=False)
-    ttl = Column(DateTime, nullable=True)
+    ttl = Column(DateTime, nullable=False)
     org_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"))
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, onupdate=func.now())
     is_deleted = Column(Boolean, default=False)
 
     organization = relationship("Organization", back_populates="invites")
-
-
