@@ -32,11 +32,7 @@ async def health():
     return {"status": "ok"}
 
 
-app = FastAPI(
-    title='Trust Free Lunch app api',
-    summary='Free Lunch App Api Collection',
-    version='1.0.0'
-)
+app = FastAPI()
 
 if not prod:
     create_database()
