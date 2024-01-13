@@ -134,8 +134,7 @@ class EmailandPhoneNumberSerializer(serializers.Serializer):
 
 class OTPVerificationSerializer(serializers.Serializer):
     otp_code = serializers.CharField(required=True)
-    email = serializers.EmailField(required=False)
-    phone = serializers.CharField(required=False)
+    email = serializers.EmailField(required=True)
 
     @staticmethod
     def get_name(user_data):
@@ -152,10 +151,6 @@ class OTPVerificationSerializer(serializers.Serializer):
     def validate(self, data):
         otp_code = data["otp_code"]
         email = data.get("email", None)
-        phone = data.get("phone", None)
-
-        if not email and not phone:
-            raise ValidationError("Either email or phone must be provided")
 
         user = None
         user_mode = None
@@ -163,9 +158,6 @@ class OTPVerificationSerializer(serializers.Serializer):
         if email:
             user_mode = "email"
             user = User.objects.filter(email=email).first()
-        elif phone:
-            user_mode = "phone"
-            user = User.objects.filter(phone=phone).first()
 
         if not user:
             raise ValidationError(f"User with the provided {user_mode} does not exist")
