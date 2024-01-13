@@ -1,16 +1,16 @@
 """
-WSGI config for screen_record_backend project.
+WSGI config for grito_talent_pool_server project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
 For more information on this file, see
-https://docs.djangoproject.com/en/4.2/howto/deployment/wsgi/
+https://docs.djangoproject.com/en/5.0/howto/deployment/wsgi/
 """
 
 import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'screen_record_backend.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'grito_talent_pool_server.settings')
 
 application = get_wsgi_application()

@@ -6,7 +6,7 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'screen_record_backend.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'grito_talent_pool_server.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
