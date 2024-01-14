@@ -15,8 +15,8 @@ urlpatterns += [
     path("login/admin/", view.AdminLoginView.as_view(), name="login-admin"),
     path("logout/", view.LogoutView.as_view(), name="logout"),
     path("reset-password/", view.ResetPasswordView.as_view(), name="reset-password"),
-    path("confirm/otp/", view.OTPVerificationView.as_view(), name="confirm-otp"),
-    path("resend/otp/", view.ResendOTPView.as_view(), name="resend-otp"),
+    path("confirm-otp/", view.OTPVerificationView.as_view(), name="confirm-otp"),
+    path("resend-otp/", view.ResendOTPView.as_view(), name="resend-otp"),
 
     path(
         "reset-password-request/",

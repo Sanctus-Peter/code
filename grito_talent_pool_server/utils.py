@@ -2,9 +2,6 @@ import json
 from decouple import config
 import requests
 from datetime import datetime
-import re
-import os
-from django.core.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status, serializers
 from django.http import JsonResponse
@@ -25,7 +22,8 @@ def send_otp_email(email, otp_code, name, product_name="Grito Talent Pool"):
             },
             "template_key": otp_template,
             "from": {"address": "support@grito.africa"},
-            "to": [{"email_address": {"address": email, "name": name}}]}
+            "to": [{"email_address": {"address": email, "name": name}}]
+        }
 
         payload = json.dumps(payload_json)
         headers = {
@@ -34,8 +32,7 @@ def send_otp_email(email, otp_code, name, product_name="Grito Talent Pool"):
             'authorization': zepto_auth,
         }
         response = requests.request("POST", url, data=payload, headers=headers)
-        
-        print(response)
+
         return response.text
     except Exception as e:
         print(e)
@@ -44,12 +41,11 @@ def send_otp_email(email, otp_code, name, product_name="Grito Talent Pool"):
 class GenerateKey:
     @staticmethod
     def return_value(phone):
-        return f"{phone}{datetime.date(datetime.now())}{settings.SECRET_KEY}"
+        return f"{phone}{datetime.now().timestamp()}{settings.SECRET_KEY}"
 
 
 def error_500(request):
     message = "An error occurred"
-    print(request)
     # send_mail to developer to handle error
     response = JsonResponse(data={"message": message, "status_code": 404})
     response.status_code = 500

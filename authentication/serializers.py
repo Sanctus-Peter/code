@@ -26,12 +26,18 @@ class SuperAdminRegistrationSerializer(serializers.Serializer):
         model = User
         fields = "__all__"
 
+    def send_otp_email(self, user):
+        key = self.generate_key(user)
+        send_otp_email(user.email, key, user.name)
+
+        user_data = self.get_user_data(user)
+        user_data["otp_code"] = key
+
     @staticmethod
-    def generate_key(email):
-        keygen = GenerateKey()
-        key_bytes = keygen.return_value(email).encode()
-        key_base32 = base64.b32encode(key_bytes).decode('utf-8')
-        return key_base32
+    def generate_key(user):
+        keygen = OTPVerificationMixin()
+        key = keygen.generate_key(user)
+        return key
 
     @staticmethod
     def get_user_data(user):
@@ -39,15 +45,6 @@ class SuperAdminRegistrationSerializer(serializers.Serializer):
         user_data = serializer.data
         user_data["otp_code"] = None
         return user_data
-
-    def send_otp_email(self, user):
-        key = self.generate_key(user.email)
-        OTP = pyotp.TOTP(key, interval=settings.OTP_TIMEOUT)
-        otp_code = OTP.now()
-        send_otp_email(user.email, otp_code, user.first_name)
-
-        user_data = self.get_user_data(user)
-        user_data["otp_code"] = otp_code
 
     @staticmethod
     def validate__password(value):
@@ -144,7 +141,7 @@ class OTPVerificationSerializer(serializers.Serializer):
         elif user_data.user_type == 'business':
             name = user_data.business_name
         elif user_data.user_type == 'super-admin':
-            name = user_data.first_name + ' ' + '(Admin)'
+            name = user_data.name + ' ' + '(Admin)'
 
         return name
 
@@ -177,7 +174,7 @@ class ResendOTPSerializer(serializers.Serializer):
 
     def validate_email(self, value):
         try:
-            User.objects.get(email=value, is_active=True)
+            User.objects.get(email=value)
             return value
         except User.DoesNotExist:
             raise serializers.ValidationError("User does not exist")
@@ -185,17 +182,15 @@ class ResendOTPSerializer(serializers.Serializer):
     def resend_otp(self):
         email = self.validated_data["email"]
         user = User.objects.get(email=email)
-        self.send_otp_email(email, user.first_name)
+        self.send_otp_email(user)
 
-    def send_otp_email(self, email, name):
-        key = self.generate_key(email)
-        OTP = pyotp.TOTP(key, interval=settings.OTP_TIMEOUT)
-        otp_code = OTP.now()
-        # send_otp_email(email, otp_code, name)
+    def send_otp_email(self, user):
+        key = self.generate_key(user)
+        print(settings.OTP_TIMEOUT)
+        send_otp_email(user.email, key, user.name)
 
     @staticmethod
-    def generate_key(email):
-        keygen = GenerateKey()
-        key_bytes = keygen.return_value(email).encode()
-        key_base32 = base64.b32encode(key_bytes).decode('utf-8')
-        return key_base32
+    def generate_key(user):
+        keygen = OTPVerificationMixin()
+        key = keygen.generate_key(user)
+        return key

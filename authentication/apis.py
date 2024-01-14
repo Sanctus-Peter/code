@@ -2,7 +2,6 @@ import base64
 import pyotp
 from django.contrib.auth import login, logout, authenticate
 from django.conf import settings
-from decouple import config
 
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
@@ -204,9 +203,6 @@ class OTPVerificationView(APIView):
                     "code": 200,
                     "status": "success",
                     "message": "OTP verification successful",
-                    "email_verification": user_data['is_email_verified'] or None,
-                    "phone_verification": user_data['is_phone_number_verified'] or None,
-                    "user_type": user_data['user_type'],
                     "name": name,
                     "refresh": str(refresh),
                     "access": str(refresh.access_token)
@@ -220,12 +216,20 @@ class OTPVerificationView(APIView):
 
 
 class ResendOTPView(APIView):
-    @staticmethod
-    def post(request, *args, **kwargs):
-        email = request.data.get("email")
+    serializer_class = ResendOTPSerializer
+    permission_classes = (AllowAny,)
 
-        serializer = ResendOTPSerializer(data={"email": email})
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+
         if serializer.is_valid():
             serializer.resend_otp()
-            return Response(status=status.HTTP_200_OK)
+            return Response(
+                {
+                    "code": 200,
+                    "status": "success",
+                    "message": "OTP sent successfully",
+                },
+                status=status.HTTP_200_OK,
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -39,3 +39,12 @@ class User(AbstractUser, PermissionsMixin):
 
     def __str__(self) -> str:
         return f"{self.user_type}: {self.last_name} {self.first_name}"
+
+
+class OTPContainer(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    otp_code = models.CharField(max_length=10, null=True, blank=True)
+    otp_base32 = models.TextField(null=True, blank=True)
+
+    def __str__(self) -> str:
+        return f"{self.user.email} - {self.otp_code}"
