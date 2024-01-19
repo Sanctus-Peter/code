@@ -13,10 +13,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-# CORS_ORIGIN_WHITELIST = [
-#     'http://localhost:4200',
-#     "https://localhost",
-# ]
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+    "https://localhost",
+]
 
 
 CORS_ALLOW_METHODS = [

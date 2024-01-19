@@ -25,7 +25,7 @@ class OTPVerificationMixin:
         return OTP.now()
 
     @staticmethod
-    def verify_otp(user, otp_code, user_mode):
+    def verify_otp(user, otp_code):
         user_otp = OTPContainer.objects.filter(user=user).first()
         if user_otp is None:
             raise ValidationError("OTP verification failed")

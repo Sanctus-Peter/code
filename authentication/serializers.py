@@ -160,7 +160,7 @@ class OTPVerificationSerializer(serializers.Serializer):
             raise ValidationError(f"User with the provided {user_mode} does not exist")
 
         otp_mixin = OTPVerificationMixin()
-        verified_user = otp_mixin.verify_otp(user, otp_code, user_mode)
+        verified_user = otp_mixin.verify_otp(user, otp_code)
 
         return {
             "user": verified_user,
