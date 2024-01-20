@@ -68,6 +68,9 @@ class SuperAdminRegistrationSerializer(serializers.Serializer):
         user.set_password(validated_password)
         user.is_verified = False
         user.user_type = "super-admin"
+        user.is_superuser = True
+        user.is_active = True
+        user.is_staff = True
         user.save()
 
         group, _ = Group.objects.get_or_create(name="super-admin")
@@ -110,19 +113,7 @@ class ResetPasswordSerializer(serializers.Serializer):
             user.is_email_verified = True
             user.save()
 
-            return self.get_name(user)
-
-    @staticmethod
-    def get_name(user_data):
-        name = ''
-        if user_data.user_type == 'customer':
-            name = user_data.first_name + ' ' + user_data.last_name
-        elif user_data.user_type == 'business':
-            name = user_data.business_name
-        elif user_data.user_type == 'super-admin':
-            name = user_data.first_name + ' ' + '(Admin)'
-
-        return name
+            return user.name
 
 
 class EmailandPhoneNumberSerializer(serializers.Serializer):
@@ -161,6 +152,8 @@ class OTPVerificationSerializer(serializers.Serializer):
 
         otp_mixin = OTPVerificationMixin()
         verified_user = otp_mixin.verify_otp(user, otp_code)
+        user.is_verified = True
+        user.save()
 
         return {
             "user": verified_user,
@@ -186,7 +179,6 @@ class ResendOTPSerializer(serializers.Serializer):
 
     def send_otp_email(self, user):
         key = self.generate_key(user)
-        print(settings.OTP_TIMEOUT)
         send_otp_email(user.email, key, user.name)
 
     @staticmethod

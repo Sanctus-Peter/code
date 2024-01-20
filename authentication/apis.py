@@ -20,7 +20,7 @@ from authentication.serializers import (
     OTPVerificationSerializer,
     ResendOTPSerializer
 )
-
+from .mixins import OTPVerificationMixin
 from grito_talent_pool_server.utils import (
     error_400,
     error_406,
@@ -29,6 +29,7 @@ from grito_talent_pool_server.utils import (
     error_404,
     GenerateKey,
     error_response,
+    send_otp_email,
 )
 
 User = get_user_model()
@@ -87,8 +88,8 @@ class AdminLoginView(APIView):
         if serializer.is_valid():
             email = serializer.validated_data["email"]
             password = serializer.validated_data["password"]
-            user = authenticate(request, email=email.lower(), password=password)
-
+            user = authenticate(email=email.lower(), password=password)
+            print(user, email, password)
             if user is not None:
                 if user.is_verified:
                     if user.groups.filter(name="super-admin").exists():
@@ -140,7 +141,6 @@ class ResetPasswordView(APIView):
                 {
                     "code": 200,
                     "message": "Your password has been changed successfully!",
-                    "email_verification": user_data['is_email_verified'],
                     "user_type": user_data['user_type'],
                     "name": name
                 },
@@ -160,19 +160,16 @@ class ResetPasswordEmailView(APIView):
         if serializer.is_valid():
             email_address = serializer.data.get("email").lower()
             try:
-                keygen = GenerateKey()
-                key = base64.b32encode(keygen.return_value(email_address).encode()).decode("utf-8")
-                OTP = pyotp.TOTP(key, interval=settings.OTP_TIMEOUT)
-                otp_code = OTP.now()
-                message = "Kindly check your email for your verification code to reset your password"
                 email = email_address
                 user = User.objects.get(email=email)
-                # send_otp_email(email, otp_code, user.first_name)
+                keygen = OTPVerificationMixin()
+                key = keygen.generate_key(user)
+                send_otp_email(user.email, key, user.name)
 
                 return Response(
                     {
                         "status": "Successful",
-                        "message": message
+                        "message": "Kindly check your email for your verification code to reset your password"
                     },
                     status=status.HTTP_200_OK,
                 )
@@ -194,7 +191,6 @@ class OTPVerificationView(APIView):
         if serializer.is_valid():
             verified_user = serializer.validated_data["user"]
             name = serializer.validated_data["name"]
-            user_data = UserUpdateVerifiedSerializer(verified_user).data
             login(request, verified_user)
             refresh = RefreshToken.for_user(verified_user)
 
