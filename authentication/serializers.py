@@ -102,15 +102,12 @@ class UserUpdateVerifiedSerializer(serializers.ModelSerializer):
 
 class ResetPasswordSerializer(serializers.Serializer):
     password = serializers.CharField(required=True)
-    confirm_password = serializers.CharField(required=True)
-
+    
     def save(self, user):
         password_1 = self.validated_data["password"]
-        password_2 = self.validated_data["confirm_password"]
-
-        if password_1 == password_2:
+        
+        if password_1:
             user.set_password(password_1)
-            user.is_email_verified = True
             user.save()
 
             return user.name
