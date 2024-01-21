@@ -134,21 +134,26 @@ class ResetPasswordView(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            user = User.objects.get(id=request.user.id)
-            name = serializer.save(user=user)
-            user_data = UserUpdateVerifiedSerializer(user).data
+            verified_user = serializer.validated_data["user"]
+            name = serializer.validated_data["name"]
+            login(request, verified_user)
+            refresh = RefreshToken.for_user(verified_user)
+
             return Response(
                 {
                     "code": 200,
-                    "message": "Your password has been changed successfully!",
-                    "user_type": user_data['user_type'],
-                    "name": name
+                    "status": "success",
+                    "message": "Your password has been saved successfully!",
+                    "name": name,
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token)
                 },
                 status=status.HTTP_200_OK,
             )
-        default_errors = serializer.errors
-        error_message = serializer_errors(default_errors)
-        return error_400(error_message)
+        else:
+            default_errors = serializer.errors
+            error_message = serializer_errors(default_errors)
+            return error_400(error_message)
 
 
 class ResetPasswordEmailView(APIView):

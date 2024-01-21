@@ -102,15 +102,31 @@ class UserUpdateVerifiedSerializer(serializers.ModelSerializer):
 
 class ResetPasswordSerializer(serializers.Serializer):
     password = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
+    otp_code = serializers.CharField(required=True)
     
-    def save(self, user):
-        password_1 = self.validated_data["password"]
+    def validate(self, data):
+        password = data["password"]
+        otp_code = data["otp_code"]
+        email = data["email"]
         
-        if password_1:
-            user.set_password(password_1)
+        
+        user = User.objects.filter(email=email).first()
+
+        if not user:
+            raise ValidationError(f"User with the provided email does not exist")
+
+        otp_mixin = OTPVerificationMixin()
+        verified_user = otp_mixin.verify_otp(user, otp_code)
+
+        if password:
+            user.set_password(password)
             user.save()
 
-            return user.name
+            return  {
+                "name": user.name,
+                "user": verified_user,
+            }
 
 
 class EmailandPhoneNumberSerializer(serializers.Serializer):
@@ -120,18 +136,6 @@ class EmailandPhoneNumberSerializer(serializers.Serializer):
 class OTPVerificationSerializer(serializers.Serializer):
     otp_code = serializers.CharField(required=True)
     email = serializers.EmailField(required=True)
-
-    @staticmethod
-    def get_name(user_data):
-        name = ''
-        if user_data.user_type == 'customer':
-            name = user_data.first_name + ' ' + user_data.last_name
-        elif user_data.user_type == 'business':
-            name = user_data.business_name
-        elif user_data.user_type == 'super-admin':
-            name = user_data.name + ' ' + '(Admin)'
-
-        return name
 
     def validate(self, data):
         otp_code = data["otp_code"]
@@ -155,7 +159,7 @@ class OTPVerificationSerializer(serializers.Serializer):
         return {
             "user": verified_user,
             "user_mode": user_mode,
-            'name': self.get_name(verified_user)
+            'name': user.name
         }
 
 
