@@ -1,5 +1,3 @@
-import base64
-import pyotp
 from django.contrib.auth import login, logout, authenticate
 from django.conf import settings
 
@@ -8,9 +6,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from authentication.models import Talent
 from authentication.serializers import (
     SuperAdminRegistrationSerializer,
     LoginSerializer,
@@ -18,8 +18,10 @@ from authentication.serializers import (
     ResetPasswordSerializer,
     EmailandPhoneNumberSerializer,
     OTPVerificationSerializer,
-    ResendOTPSerializer
+    ResendOTPSerializer,
+    CreateUpdateSerializer
 )
+
 from .mixins import OTPVerificationMixin
 from grito_talent_pool_server.utils import (
     error_400,
@@ -234,3 +236,101 @@ class ResendOTPView(APIView):
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CreateUpdateTalentView(APIView):
+    # parser_classes = [MultiPartParser, FormParser]
+    serializer_class = CreateUpdateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = self.serializer_class(
+            data=request.data, context={"request": request}
+        )
+        if serializer.is_valid():
+            if request.user.is_verified and request.user.groups.filter("super-admin").exist():
+                code, result = serializer.create_or_update(serializer.validated_data, 'post')
+                if code == 406:
+                    return error_406(result)
+                return Response(
+                    {
+                        "code": 201,
+                        "status": "success",
+                        "message": f"user with {email} successfully added to Talent Pool."
+                    },
+                    status=status.HTTP_201_CREATED
+                )
+            return error_401("User is unautorized to carry out this operation.")
+        
+        default_errors = serializer.errors
+        error_message = serializer_errors(default_errors)
+        return error_400(error_message)
+
+    def put(self, request):
+        serializer = self.serializer_class(
+            data=request.data, context={"request": request}
+        )
+        if serializer.is_valid():
+            if request.user.is_verified and request.user.groups.filter("super-admin").exist():
+                code, result = serializer.create_or_update(serializer.validated_data, 'put')
+                if code == 406:
+                    return error_406(result)
+                return Response(
+                    {
+                        "code": 201,
+                        "status": "success",
+                        "message": f"User detail edited successfully."
+                    },
+                    status=status.HTTP_201_CREATED
+                )
+            return error_401("User is unautorized to carry out this operation.")
+        
+        default_errors = serializer.errors
+        error_message = serializer_errors(default_errors)
+        return error_400(error_message)
+
+
+class TalentRequestView(APIView):
+    serializer_class = CreateUpdateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = self.serializer_class(
+            data=request.data, context={"request": request}
+        )
+        if serializer.is_valid():
+            if request.user.is_verified and request.user.groups.filter("super-admin").exist():
+                code, result = serializer.create_or_update(serializer.validated_data, 'post')
+                if code == 406:
+                    return error_406(result)
+                return Response(
+                    {
+                        "code": 201,
+                        "status": "success",
+                        "message": f"Talent request successfully sent."
+                    },
+                    status=status.HTTP_201_CREATED
+                )
+            return error_401("User is unautorized to carry out this operation.")
+        
+        default_errors = serializer.errors
+        error_message = serializer_errors(default_errors)
+        return error_400(error_message)
+    
+
+class TalentList(APIView):
+    def get(self, request):
+        talents = Talent.objects.all()
+        serializer = TalentWithUserSerializer(talents, many=True)
+        return Response(serializer.data)
+
+class TalentDetail(APIView):
+    def get(self, request, pk):
+        talent = Talent.objects.get(pk=pk)
+        serializer = TalentWithUserSerializer(talent)
+        return Response(serializer.data)
+
+    def delete(self, request, pk):
+        talent = Talent.objects.get(pk=pk)
+        talent.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

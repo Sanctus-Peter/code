@@ -5,6 +5,7 @@ from django.contrib.auth.models import (
 )
 from .manager import CustomUserManager
 from django_countries.fields import CountryField
+from django.contrib.postgres.fields import ArrayField
 # from grito_talent_pool_server.models import BaseModel
 import uuid
 
@@ -48,3 +49,16 @@ class OTPContainer(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user.email} - {self.otp_code}"
+
+
+class Talent(models.Model):
+    SKILL_LEVEL = (("beginner", "Beginner"), (""))
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="talent")
+    skill_level = models.CharField(max_length=255, null=True, blank=True)
+    profile_link = models.TextField(null=True, blank=True)
+    core_skill = models.CharField(max_length=255, null=True, blank=True)
+    skill_set = ArrayField(models.CharField(max_length=255, blank=True), null=True)
+    resume_file_url = models.TextField(null=True, blank=True)
+    profile_summary = models.TextField(null=True, blank=True)
+    is_archived = models.BooleanField(default=False, null=True, blank=True)
+

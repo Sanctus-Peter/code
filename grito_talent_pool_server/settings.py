@@ -2,6 +2,9 @@
 import datetime
 from pathlib import Path
 from decouple import config
+import cloudinary
+
+
 # from dotenv import load_dotenv
 #
 # load_dotenv()
@@ -11,12 +14,15 @@ SECRET_KEY = config("SECRET_KEY")
 
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+  'https://next-auth-two-pi.vercel.app',
+]
+
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
-    "https://localhost",
+    'https://next-auth-two-pi.vercel.app'
 ]
 
 
@@ -51,6 +57,13 @@ DATABASES = {
         "PORT": config("DB_PORT")
     }
 }
+
+cloudinary.config(
+    cloud_name=config("CLOUDINARY_NAME"),
+    api_key=config("CLOUDINARY_API_KEY"),
+    api_secret=config("CLOUDINARY_API_SECRET"),
+    secure=True
+)
 
 
 INSTALLED_APPS = [
