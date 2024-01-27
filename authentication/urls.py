@@ -34,7 +34,7 @@ urlpatterns += [
       view.TalentRequestView.as_view(),
       name="talent-request"
     ),
-    path(
+    # path(
       
-    )
+    # )
 ]
