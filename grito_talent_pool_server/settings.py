@@ -18,12 +18,12 @@ ALLOWED_HOSTS = [
   'https://next-auth-two-pi.vercel.app',
 ]
 
-CORS_ALLOW_CREDENTIALS = True
 
-CORS_ORIGIN_WHITELIST = [
+CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
-    'https://next-auth-two-pi.vercel.app'
+    'https://next-auth-two-pi.vercel.app',
 ]
+
 
 
 CORS_ALLOW_METHODS = [
@@ -46,6 +46,8 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 DATABASES = {
     "default": {
