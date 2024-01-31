@@ -19,9 +19,10 @@ SPECTACULAR_SETTINGS = {
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("auth/v1/", include("authentication.urls")),
+    path("talent-api/v1/", include("talent.urls")),
 
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-    # Optional UI:
+    
     path(
         "api/docs",
         SpectacularSwaggerView.as_view(url_name="schema"),

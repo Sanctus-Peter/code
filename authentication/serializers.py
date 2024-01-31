@@ -195,12 +195,15 @@ class ResendOTPSerializer(serializers.Serializer):
 
 class CreateUpdateSerializer(serializers.ModelSerializer):
     GENDER = (("male", "Male"), ("female", "Female"))
+    LEVEL = (("beginner", "Beginner"), ("intermediate", "Intermediate"), ("professional", "Professional"))
     name = serializers.CharField()
     gender = serializers.ChoiceField(choices=GENDER)
-    country = CountryField()
+    country = serializers.CharField(default="NG")
     email = serializers.CharField(required=True)
     image = serializers.ImageField()
     resume = serializers.ImageField()
+    level = serializers.ChoiceField(choices=LEVEL)
+    contact_number = serializers.CharField(max_length=15)
 
     class Meta:
         model = Talent
@@ -237,6 +240,7 @@ class CreateUpdateSerializer(serializers.ModelSerializer):
         user_instance.gender = gender
         user_instance.country = country
         user_instance.is_active = user_instance.is_verified = True
+        user_instance.user_type = 'talent'
         if image_file:
             user_instance.image_url = image_url
 
@@ -252,7 +256,7 @@ class CreateUpdateSerializer(serializers.ModelSerializer):
             group, _ = Group.objects.get_or_create(name="talent")
             user_instance.groups.add(group)
 
-        return user_instance
+        return 200, user_instance
     
 
 class TalentWithUserSerializer(serializers.ModelSerializer):

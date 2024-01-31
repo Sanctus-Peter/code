@@ -16,11 +16,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
   'https://next-auth-two-pi.vercel.app',
+  'http://localhost:8000',
+  '127.0.0.1',
 ]
 
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
+    'http://localhost:8000',
     'https://next-auth-two-pi.vercel.app',
 ]
 
@@ -81,6 +84,7 @@ INSTALLED_APPS = [
 
     "corsheaders",
     "authentication",
+    'talent',
 ]
 
 MIDDLEWARE = [

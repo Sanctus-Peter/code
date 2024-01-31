@@ -24,16 +24,7 @@ urlpatterns += [
         name="reset-password-link",
     ),
 
-    path(
-      "admin/talent",
-      view.CreateUpdateTalentView.as_view(),
-      name="create-or-update-talent"
-    ),
-    path(
-      "talent-request",
-      view.TalentRequestView.as_view(),
-      name="talent-request"
-    ),
+    
     # path(
       
     # )
