@@ -18,6 +18,7 @@ ALLOWED_HOSTS = [
   'https://next-auth-two-pi.vercel.app',
   'http://localhost:8000',
   '127.0.0.1',
+  'grito-server.azurewebsites.net',
 ]
 
 
