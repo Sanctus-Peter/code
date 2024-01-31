@@ -132,7 +132,7 @@ class AdminLoginView(APIView):
 
 class ResetPasswordView(APIView):
     serializer_class = ResetPasswordSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
