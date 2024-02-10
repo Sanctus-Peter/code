@@ -4,9 +4,7 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from .manager import CustomUserManager
-from django_countries.fields import CountryField
 from django.contrib.postgres.fields import ArrayField
-# from grito_talent_pool_server.models import BaseModel
 import uuid
 
 
@@ -29,7 +27,7 @@ class User(AbstractUser, PermissionsMixin):
         max_length=255, choices=USER_TYPE, null=True, blank=True
     )
     address = models.TextField(null=True, blank=True)
-    country = CountryField(default="NG")
+    country = models.CharField(max_length=50, null=True, blank=True)
     is_verified = models.BooleanField(default=False, null=True, blank=True)
     is_active = models.BooleanField(default=False, null=True, blank=True)
 

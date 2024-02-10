@@ -94,7 +94,6 @@ class LoginSerializer(serializers.Serializer):
 class UserUpdateVerifiedSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        # fields = ('__all__')
         exclude = (
             "is_active",
             "password",
@@ -198,7 +197,7 @@ class CreateUpdateSerializer(serializers.ModelSerializer):
     LEVEL = (("beginner", "Beginner"), ("intermediate", "Intermediate"), ("professional", "Professional"))
     name = serializers.CharField()
     gender = serializers.ChoiceField(choices=GENDER)
-    country = serializers.CharField(default="NG")
+    country = serializers.CharField()
     email = serializers.CharField(required=True)
     image = serializers.ImageField()
     resume = serializers.ImageField()
@@ -272,9 +271,10 @@ class TalentWithUserSerializer(serializers.ModelSerializer):
             'id': user.id,
             'username': user.username,
             'email': user.email,
-            'phone': user.phone,
+            'contact_no': user.phone,
             'name': user.name,
-            'country': user.country.name,
+            'gender': user.gender,
+            'country': user.country,
             'image_url': user.image_url,
         }
     

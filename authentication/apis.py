@@ -240,7 +240,6 @@ class ResendOTPView(APIView):
 
 
 class CreateUpdateTalentView(APIView):
-    # parser_classes = [MultiPartParser, FormParser]
     serializer_class = CreateUpdateSerializer
     permission_classes = [IsAuthenticated]
 
@@ -249,7 +248,7 @@ class CreateUpdateTalentView(APIView):
             data=request.data, context={"request": request}
         )
         if serializer.is_valid():
-            if request.user.is_verified and request.user.groups.filter("super-admin").exist():
+            if request.user.is_verified and request.user.groups.filter(name="super-admin").exist():
                 code, result = serializer.create_or_update(serializer.validated_data, 'post')
                 if code == 406:
                     return error_406(result)
@@ -272,7 +271,7 @@ class CreateUpdateTalentView(APIView):
             data=request.data, context={"request": request}
         )
         if serializer.is_valid():
-            if request.user.is_verified and request.user.groups.filter("super-admin").exist():
+            if request.user.is_verified and request.user.groups.filter(name="super-admin").exist():
                 code, result = serializer.create_or_update(serializer.validated_data, 'put')
                 if code == 406:
                     return error_406(result)
@@ -336,6 +335,6 @@ class TalentDetail(APIView):
         try:
             talent = Talent.objects.get(user_id=pk)
             talent.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response("talent successfully")
         except Talent.DoesNotExist:
             return error_404(f"talent with the id {pk} does not exist.")

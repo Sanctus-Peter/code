@@ -14,16 +14,13 @@ SECRET_KEY = config("SECRET_KEY")
 
 DEBUG = True
 
-ALLOWED_HOSTS = [
-  'https://next-auth-two-pi.vercel.app',
-  'http://localhost:8000',
-  '127.0.0.1',
+ALLOWED_HOSTS = ["*"
 ]
 
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
-    'http://localhost:8000',
+    'http://localhost',
     'https://next-auth-two-pi.vercel.app',
 ]
 
