@@ -198,7 +198,7 @@ class CreateUpdateSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
     gender = serializers.ChoiceField(choices=GENDER)
     country = serializers.CharField()
-    email = serializers.CharField(required=True)
+    email = serializers.EmailField()
     image = serializers.ImageField()
     resume = serializers.ImageField()
     level = serializers.ChoiceField(choices=LEVEL)
