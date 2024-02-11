@@ -271,7 +271,7 @@ class TalentWithUserSerializer(serializers.ModelSerializer):
             'id': user.id,
             'username': user.username,
             'email': user.email,
-            'contact_no': user.phone,
+            'contact_number': user.phone,
             'name': user.name,
             'gender': user.gender,
             'country': user.country,
