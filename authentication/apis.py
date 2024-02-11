@@ -256,7 +256,7 @@ class CreateUpdateTalentView(APIView):
                     {
                         "code": 201,
                         "status": "success",
-                        "message": f"user with {serializer.validated_data['email']} successfully added to Talent Pool."
+                        "message": f"user with {result.email} successfully added to Talent Pool."
                     },
                     status=status.HTTP_201_CREATED
                 )
