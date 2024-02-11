@@ -248,7 +248,7 @@ class CreateUpdateTalentView(APIView):
             data=request.data, context={"request": request}
         )
         if serializer.is_valid():
-            if request.user.is_verified and request.user.groups.filter(name="super-admin").exist():
+            if request.user.is_verified and request.user.groups.filter(name="super-admin").exists():
                 code, result = serializer.create_or_update(serializer.validated_data, 'post')
                 if code == 406:
                     return error_406(result)
@@ -271,7 +271,7 @@ class CreateUpdateTalentView(APIView):
             data=request.data, context={"request": request}
         )
         if serializer.is_valid():
-            if request.user.is_verified and request.user.groups.filter(name="super-admin").exist():
+            if request.user.is_verified and request.user.groups.filter(name="super-admin").exists():
                 code, result = serializer.create_or_update(serializer.validated_data, 'put')
                 if code == 406:
                     return error_406(result)
