@@ -240,6 +240,7 @@ class ResendOTPView(APIView):
 
 
 class CreateUpdateTalentView(APIView):
+    
     serializer_class = CreateUpdateSerializer
     permission_classes = [IsAuthenticated]
 
