@@ -52,6 +52,7 @@ class OTPContainer(models.Model):
 class Talent(models.Model):
     SKILL_LEVEL = (("beginner", "Beginner"), ("intermediate", "Intermediate"), ("professional", "Professional"))
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="talent")
+    admin_defined_skill = models.BooleanField(default=False)
     skill_level = models.CharField(max_length=255, null=True, blank=True)
     profile_link = models.TextField(null=True, blank=True)
     core_skill = models.CharField(max_length=255, null=True, blank=True)

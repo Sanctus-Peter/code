@@ -253,6 +253,9 @@ class CreateUpdateTalentView(APIView):
                 code, result = serializer.create_or_update(serializer.validated_data, 'post')
                 if code == 406:
                     return error_406(result)
+                talent_instance = Talent.objects.get(user=result)
+                talent_instance.admin_defined_skill = True
+                talent_instance.save()
                 return Response(
                     {
                         "code": 201,
@@ -302,6 +305,9 @@ class TalentRequestView(APIView):
             code, result = serializer.create_or_update(serializer.validated_data, 'post')
             if code == 406:
                 return error_406(result)
+            talent_instance = Talent.objects.get(user=result)
+            talent_instance.admin_defined_skill = False
+            talent_instance.save()
             return Response(
                 {
                     "code": 201,
@@ -318,7 +324,14 @@ class TalentRequestView(APIView):
 
 class TalentList(APIView):
     def get(self, request):
-        talents = Talent.objects.all()
+        talents = Talent.objects.filter(admin_defined_skill=True)
+        serializer = TalentWithUserSerializer(talents, many=True)
+        return Response(serializer.data)
+    
+
+class TalentRequestList(APIView):
+    def get(self, request):
+        talents = Talent.objects.filter(admin_defined_skill=False)
         serializer = TalentWithUserSerializer(talents, many=True)
         return Response(serializer.data)
 
