@@ -18,7 +18,7 @@ urlpatterns += [
       name="talent-request"
     ),
     path(
-      "admin/talent",
+      "admin/talents",
       view.TalentRequestList.as_view(),
       name="get-all-talent-requests"
     ),
