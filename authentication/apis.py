@@ -330,6 +330,7 @@ class TalentList(APIView):
     
 
 class TalentRequestList(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         talents = Talent.objects.filter(admin_defined_skill=False)
         serializer = TalentWithUserSerializer(talents, many=True)
@@ -337,6 +338,7 @@ class TalentRequestList(APIView):
 
 
 class TalentDetail(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, pk):
         try:
             talent = Talent.objects.get(user_id=pk)
