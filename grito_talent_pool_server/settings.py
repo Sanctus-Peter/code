@@ -21,6 +21,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://localhost',
     'https://next-auth-two-pi.vercel.app',
+    'https://my-practice-ten.vercel.app',
 ]
 
 
@@ -168,6 +169,6 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
