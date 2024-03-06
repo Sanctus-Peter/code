@@ -223,6 +223,7 @@ class CreateUpdateSerializer(serializers.ModelSerializer):
         email = data.pop('email', None)
         image_file = data.pop('image', None)
         resume_file = data.pop('resume', None)
+        contact_number = data.pop('contact_number', None)
 
         # Cloudinary upload for image
         if image_file:
@@ -238,6 +239,7 @@ class CreateUpdateSerializer(serializers.ModelSerializer):
         user_instance.name = name
         user_instance.gender = gender
         user_instance.country = country
+        user_instance.contact_number = contact_number
         user_instance.is_active = user_instance.is_verified = True
         user_instance.user_type = 'talent'
         if image_file:
