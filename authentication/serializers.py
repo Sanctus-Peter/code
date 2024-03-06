@@ -18,7 +18,7 @@ from .mixins import OTPVerificationMixin
 from .models import User
 from .models import Talent
 from cloudinary import uploader
-
+# hshsb
 
 class SuperAdminRegistrationSerializer(serializers.Serializer):
     name = serializers.CharField(required=True)
