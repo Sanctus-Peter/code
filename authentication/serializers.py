@@ -239,7 +239,7 @@ class CreateUpdateSerializer(serializers.ModelSerializer):
         user_instance.name = name
         user_instance.gender = gender
         user_instance.country = country
-        user_instance.contact_number = contact_number
+        user_instance.phone = contact_number
         user_instance.is_active = user_instance.is_verified = True
         user_instance.user_type = 'talent'
         if image_file:
