@@ -235,7 +235,13 @@ class CreateUpdateSerializer(serializers.ModelSerializer):
             resume_upload_result = uploader.upload(resume_file)
             data['resume_file_url'] = resume_upload_result.get('url')
 
-        user_instance, created = User.objects.get_or_create(email=email)
+        if method == 'post':
+            user_instance = User.objects.create(email=email)
+        else:
+            try:
+                user_instance = User.objects.get(id=method)
+            except User.DoesNotExist:
+                return 404, f"user with id: {method} does not exist"
         user_instance.name = name
         user_instance.gender = gender
         user_instance.country = country

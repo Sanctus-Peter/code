@@ -239,8 +239,35 @@ class ResendOTPView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class CreateUpdateTalentView(APIView):
+class UpdateTalentView(APIView):
+    serializer_class = CreateUpdateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, pk):
+        serializer = self.serializer_class(
+            data=request.data, context={"request": request}
+        )
+        if serializer.is_valid():
+            if request.user.is_verified and request.user.groups.filter(name="super-admin").exists():
+                code, result = serializer.create_or_update(serializer.validated_data, pk)
+                if code == 404:
+                    return error_404(result)
+                return Response(
+                    {
+                        "code": 201,
+                        "status": "success",
+                        "message": f"User detail edited successfully."
+                    },
+                    status=status.HTTP_201_CREATED
+                )
+            return error_401("User is unautorized to carry out this operation.")
+        
+        default_errors = serializer.errors
+        error_message = serializer_errors(default_errors)
+        return error_400(error_message)
     
+    
+class CreateTalentView(APIView):
     serializer_class = CreateUpdateSerializer
     permission_classes = [IsAuthenticated]
 
@@ -261,29 +288,6 @@ class CreateUpdateTalentView(APIView):
                         "code": 201,
                         "status": "success",
                         "message": f"user with {result.email} successfully added to Talent Pool."
-                    },
-                    status=status.HTTP_201_CREATED
-                )
-            return error_401("User is unautorized to carry out this operation.")
-        
-        default_errors = serializer.errors
-        error_message = serializer_errors(default_errors)
-        return error_400(error_message)
-
-    def put(self, request):
-        serializer = self.serializer_class(
-            data=request.data, context={"request": request}
-        )
-        if serializer.is_valid():
-            if request.user.is_verified and request.user.groups.filter(name="super-admin").exists():
-                code, result = serializer.create_or_update(serializer.validated_data, 'put')
-                if code == 406:
-                    return error_406(result)
-                return Response(
-                    {
-                        "code": 201,
-                        "status": "success",
-                        "message": f"User detail edited successfully."
                     },
                     status=status.HTTP_201_CREATED
                 )
