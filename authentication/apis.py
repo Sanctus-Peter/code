@@ -252,6 +252,9 @@ class UpdateTalentView(APIView):
                 code, result = serializer.create_or_update(serializer.validated_data, pk)
                 if code == 404:
                     return error_404(result)
+                talent_instance = Talent.objects.get(user=result)
+                talent_instance.admin_defined_skill = True
+                talent_instance.save()
                 return Response(
                     {
                         "code": 201,
