@@ -18,10 +18,8 @@ ALLOWED_HOSTS = ["*"]
 
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'http://localhost',
-    'https://next-auth-two-pi.vercel.app',
     'https://my-practice-ten.vercel.app',
+    'https://www.grito.africa',
 ]
 
 
